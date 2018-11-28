@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Learning React,js</title>
+    <link
+      rel="stylesheet"
+      href="http://maxcdn.boodstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    />
+    <script src="https://fb.me/react-0.14.7.js"></script>
+    <script src="https://fb.me/react-dom-0.14.7.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.25/browser.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12"><div id="app"></div></div>
+      </div>
+    </div>
+
+    <script type="text/babel">
+      var App = React.createClass({
+        getInitialState: function() {
+          return {
+            text: '',
+            todos: [
+              { id: 1, text: 'Meeting At Work' },
+              { id: 2, text: 'Bring Kids to School' },
+              { id: 3, text: 'Food Shopping' }
+            ]
+          };
+        },
+
+        render: function() {
+          return (
+            <div>
+              <TodoForm onTodoAdd={this.handleTodoAdd} />
+              <TodoList todos={this.state.todos} />
+            </div>
+          );
+        },
+
+        handleTodoAdd: function(text) {
+          var newTodo = {
+            id: this.state.todos.length + 1,
+            text: text
+          };
+          this.setState({ todos: this.state.todos.concat(newTodo) });
+        }
+      });
+
+      var TodoForm = React.createClass({
+        render: function() {
+          return (
+            <div>
+              <form onSubmit={this.onSubmit}>
+                <div className="form-group">
+                  <label>Todo Text</label>
+                  <input
+                    type="text"
+                    ref="text"
+                    onChange={this.onChange}
+                    className="form-control"
+                  />
+                </div>
+              </form>
+            </div>
+          );
+        },
+
+        onChange: function() {
+          console.log('Changing text');
+        },
+
+        onSubmit: function(e) {
+          e.preventDefault();
+          var text = this.refs.text.value.trim();
+          if (!text) {
+            alert('Please enter a todo');
+            return;
+          }
+
+          this.props.onTodoAdd(text);
+          this.refs.text.value = '';
+        }
+      });
+
+      var TodoList = React.createClass({
+        render: function() {
+          return (
+            <ul className="list-group">
+              {this.props.todos.map(todo => {
+                return (
+                  <li className="list-group-item" todo={todo} key={todo.id}>
+                    {todo.text}
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        }
+      });
+
+      ReactDOM.render(<App />, document.getElementById('app'));
+    </script>
+  </body>
+</html>
