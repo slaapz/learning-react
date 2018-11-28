@@ -25,14 +25,15 @@
         propTypes: {
           title: React.PropTypes.string.isRequired
         },
+
         getDefaultProps: function() {
           return {
             title: 'Hello World',
             text:
-              'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.',
-            link: 'http://eduonix.com'
+              'This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.'
           };
         },
+
         render: function() {
           return (
             <div className="jumbotron">
@@ -44,15 +45,19 @@
                 content out within the larger container.
               </p>
               <a
+                onClick={this.onClick.bind(this, 'Hello', 'Good-bye')}
                 className="btn btn-primary btn-lg"
-                href={this.props.link}
+                href="#"
                 role="button"
-                target="_blank"
               >
                 Learn more
               </a>
             </div>
           );
+        },
+
+        onClick: function(greeting, greeting2) {
+          alert(greeting2);
         }
       });
       ReactDOM.render(<Jumbotron />, document.getElementById('jumbotron'));
