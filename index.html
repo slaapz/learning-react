@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Learning React,js</title>
+    <link
+      rel="stylesheet"
+      href="http://maxcdn.boodstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    />
+    <script src="https://fb.me/react-0.14.7.js"></script>
+    <script src="https://fb.me/react-dom-0.14.7.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.25/browser.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12"><div id="jumbotron"></div></div>
+      </div>
+    </div>
+
+    <script type="text/babel">
+      var Jumbotron = React.createClass({
+        render: function() {
+          return (
+            <div className="jumbotron">
+              <h1 className="display-4">Hello, world!</h1>
+              <p className="lead">
+                This is a simple hero unit, a simple jumbotron-style component
+                for calling extra attention to featured content or information.
+              </p>
+              <hr className="my-4" />
+              <p>
+                It uses utility classes for typography and spacing to space
+                content out within the larger container.
+              </p>
+              <a className="btn btn-primary btn-lg" href="#" role="button">
+                Learn more
+              </a>
+            </div>
+          );
+        }
+      });
+      ReactDOM.render(<Jumbotron />, document.getElementById('jumbotron'));
+    </script>
+  </body>
+</html>
