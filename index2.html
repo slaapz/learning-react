@@ -13,18 +13,7 @@
     <script src="https://fb.me/react-dom-0.14.7.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.25/browser.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
-    <script>
-         // Initialize Firebase
-        var config = {
-            apiKey: "AIzaSyDCXdlDB6vYKM4lGDhvDbl9X9Ptyvbzc2U",
-            authDomain: "todolist-3a0bd.firebaseapp.com",
-            databaseURL: "https://todolist-3a0bd.firebaseio.com",
-            projectId: "todolist-3a0bd",
-            storageBucket: "todolist-3a0bd.appspot.com",
-            messagingSenderId: "1096099320150"
-        };
-        firebase.initializeApp(config);
-</script>
+    <script src="config.js"></script>
     </script>
     <style>
       body {
@@ -53,9 +42,9 @@
           };
         },
         componentWillMount: function() {
-          this.firebaseRef = firebase.database().ref();
+          this.firebaseRef = firebase.database();
             var that = this;
-          this.firebaseRef.once("value", function(snapshot){
+          this.firebaseRef.ref().once("value", function(snapshot){
               var todos = [];
               snapshot.forEach(function(data){
                   var todo = {
@@ -93,29 +82,46 @@
             id: this.state.todos.length + 1,
             text: text
           };
-          this.firebaseRef.push(newTodo);
-          this.setState({ todos: this.state.todos.concat(newTodo) });
+          this.firebaseRef.ref().push(newTodo);
+          this.setState({ 
+                todos: this.state.todos.concat(newTodo),
+                text: ''
+            });
         },
 
         handleTodoDelete: function(todo) {
-          var todos = this.state.todos;
-          for (var i = 0; i < todos.length; i++) {
-            if (todos[i].id == todo.id) {
-              todos.splice(i, 1);
+            var todos = this.state.todos;
+            for (var i = 0; i < todos.length; i++) {
+                if (todos[i].id == todo.id) {
+                    this.firebaseRef.ref(todos[i].parent).remove();
+                    todos.splice(i, 1);
+                }
+
+                if(todos.length == 0 ) {
+                    todos = [];
+                } 
+
+                this.setState({
+                    todos: todos,
+                    text: ''
+                });
             }
-            this.setState({ todos: todos });
-          }
-        },
+          },
 
         handleTodoUpdate: function(todo) {
           var todos = this.state.todos;
           for (var i = 0; i < todos.length; i++) {
             if (todos[i].id == todo.id) {
-              todos.splice(i, 1);
+                this.firebaseRef.ref(todos[i].parent).update({text: todo.text});
+                todos.splice(i, 1);
             }
             todos.push(todo);
-            this.setState({ todos: todos });
+            this.setState({ 
+                todos: todos,
+                text:''
+            });
           }
+          console.log(this.state);
         },
 
         handleTodoEdit: function(todo) {
@@ -160,18 +166,17 @@
           if (!text) {
             alert('Please enter a todo');
             return;
-          }
-          if (this.props.isEdit) {
-            var updatedTodo = {
-              id: this.props.isEdit,
-              text: text
-            };
-            console.log(updatedTodo);
-            this.props.onTodoUpdate(updatedTodo);
           } else {
-            this.props.onTodoAdd(text);
+            if (this.props.isEdit) {
+                var updatedTodo = {
+                id: this.props.isEdit,
+                text: text
+                };
+                this.props.onTodoUpdate(updatedTodo);
+            } else {
+                this.props.onTodoAdd(text);
+            }
           }
-
           this.refs.text.value = '';
         }
       });
@@ -184,8 +189,7 @@
                 return (
                   <li className="list-group-item" todo={todo} key={todo.id}>
                     <span onClick={this.editTodo.bind(this, todo)}>
-                      {' '}
-                      {todo.text}{' '}
+                      {todo.text}
                     </span>
                     <a
                       onClick={this.onDelete.bind(this, todo)}
