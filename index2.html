@@ -34,6 +34,7 @@
         getInitialState: function() {
           return {
             text: '',
+            isEdit: 0,
             todos: [
               { id: 1, text: 'Meeting At Work' },
               { id: 2, text: 'Bring Kids to School' },
@@ -45,10 +46,16 @@
         render: function() {
           return (
             <div>
-              <TodoForm onTodoAdd={this.handleTodoAdd} />
+              <TodoForm
+                {...this.state}
+                onTodoAdd={this.handleTodoAdd}
+                onTodoUpdate={this.handleTodoUpdate}
+                changeText={this.handleChangeText}
+              />
               <TodoList
-                todos={this.state.todos}
+                {...this.state}
                 deleteTodo={this.handleTodoDelete}
+                editTodo={this.handleTodoEdit}
               />
             </div>
           );
@@ -70,6 +77,28 @@
             }
             this.setState({ todos: todos });
           }
+        },
+
+        handleTodoUpdate: function(todo) {
+          var todos = this.state.todos;
+          for (var i = 0; i < todos.length; i++) {
+            if (todos[i].id == todo.id) {
+              todos.splice(i, 1);
+            }
+            todos.push(todo);
+            this.setState({ todos: todos });
+          }
+        },
+
+        handleTodoEdit: function(todo) {
+          this.setState({
+            text: todo.text,
+            isEdit: todo.id
+          });
+        },
+
+        handleChangeText: function(text) {
+          this.setState({ text: text });
         }
       });
 
@@ -83,6 +112,7 @@
                   <input
                     type="text"
                     ref="text"
+                    value={this.props.text}
                     onChange={this.onChange}
                     className="form-control"
                   />
@@ -92,8 +122,8 @@
           );
         },
 
-        onChange: function() {
-          console.log('Changing text');
+        onChange: function(e) {
+          this.props.changeText(e.target.value);
         },
 
         onSubmit: function(e) {
@@ -103,8 +133,17 @@
             alert('Please enter a todo');
             return;
           }
+          if (this.props.isEdit) {
+            var updatedTodo = {
+              id: this.props.isEdit,
+              text: text
+            };
+            console.log(updatedTodo);
+            this.props.onTodoUpdate(updatedTodo);
+          } else {
+            this.props.onTodoAdd(text);
+          }
 
-          this.props.onTodoAdd(text);
           this.refs.text.value = '';
         }
       });
@@ -116,7 +155,10 @@
               {this.props.todos.map(todo => {
                 return (
                   <li className="list-group-item" todo={todo} key={todo.id}>
-                    {todo.text}{' '}
+                    <span onClick={this.editTodo.bind(this, todo)}>
+                      {' '}
+                      {todo.text}{' '}
+                    </span>
                     <a
                       onClick={this.onDelete.bind(this, todo)}
                       className="delete"
@@ -133,6 +175,10 @@
 
         onDelete: function(todo) {
           this.props.deleteTodo(todo);
+        },
+
+        editTodo: function(todo) {
+          this.props.editTodo(todo);
         }
       });
 
