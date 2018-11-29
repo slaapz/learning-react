@@ -12,6 +12,20 @@
     <script src="https://fb.me/react-0.14.7.js"></script>
     <script src="https://fb.me/react-dom-0.14.7.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.25/browser.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
+    <script>
+         // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyDCXdlDB6vYKM4lGDhvDbl9X9Ptyvbzc2U",
+            authDomain: "todolist-3a0bd.firebaseapp.com",
+            databaseURL: "https://todolist-3a0bd.firebaseio.com",
+            projectId: "todolist-3a0bd",
+            storageBucket: "todolist-3a0bd.appspot.com",
+            messagingSenderId: "1096099320150"
+        };
+        firebase.initializeApp(config);
+</script>
+    </script>
     <style>
       body {
         margin-top: 30px;
@@ -35,12 +49,25 @@
           return {
             text: '',
             isEdit: 0,
-            todos: [
-              { id: 1, text: 'Meeting At Work' },
-              { id: 2, text: 'Bring Kids to School' },
-              { id: 3, text: 'Food Shopping' }
-            ]
+            todos: []
           };
+        },
+        componentWillMount: function() {
+          this.firebaseRef = firebase.database().ref();
+            var that = this;
+          this.firebaseRef.once("value", function(snapshot){
+              var todos = [];
+              snapshot.forEach(function(data){
+                  var todo = {
+                      id: data.val().id,
+                      text: data.val().text
+                  }
+                  todos.push(todo);
+                  that.setState({
+                      todos: todos
+                  })
+              });
+          });
         },
 
         render: function() {
@@ -66,6 +93,7 @@
             id: this.state.todos.length + 1,
             text: text
           };
+          this.firebaseRef.push(newTodo);
           this.setState({ todos: this.state.todos.concat(newTodo) });
         },
 
